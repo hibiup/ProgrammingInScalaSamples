@@ -1,6 +1,6 @@
 public class TestStaticInnerClazz {
-    static void say(String message){ System.out.println(message); }
-    void non_static_say(String message) { System.out.println(message); }
+    static private void say(String message){ System.out.println(message); }
+    private void non_static_say(String message) { System.out.println(message); }
 
     public static void main(String [] args) {
         /** 可以在静态方法中直接访问静态内部类的静态方法 */
@@ -18,13 +18,14 @@ public class TestStaticInnerClazz {
         testClazz.testInnerClazzes();
     }
 
-    void testInnerClazzes() {
+    private void testInnerClazzes() {
         /** 可以在非静态方法中访问内部静态类的静态方法　*/
         InnerStaticClazz.inner_say("Calling inner say() from inner method");
 
         /** 也可以实例化静态类，然后访问成员方法 */
         InnerStaticClazz innerStatic = new InnerStaticClazz();
         innerStatic.inner_non_static_say("Call inner non-static say() from inner method");
+        InnerStaticClazz.inner_static_say_with_reference(this, "Call inner non-static say() from inner method with owner");
 
         /** 对内部非静态类也没有限制 */
         InnerNonStaticClazz innerNonStatic = new InnerNonStaticClazz();
