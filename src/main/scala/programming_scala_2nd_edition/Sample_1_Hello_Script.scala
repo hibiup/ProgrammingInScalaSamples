@@ -1,4 +1,4 @@
-package programming_scala_2nd_edition
+package programming_scala_2nd_edition.sample_1
 
 /**
   * 测试 scala 脚本:
