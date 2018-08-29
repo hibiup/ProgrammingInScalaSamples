@@ -8,7 +8,7 @@ object duck_typing extends App{
     }
 
     trait Swimming {
-        def swim:Unit = println("Only a duck can swimmsing")
+        def swim:Unit = println("Only a duck can swimming")
     }
 
     trait Quacking extends Bird{
