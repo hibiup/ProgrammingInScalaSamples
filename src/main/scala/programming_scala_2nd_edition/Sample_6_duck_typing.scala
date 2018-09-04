@@ -18,11 +18,13 @@ object duck_typing extends App{
     trait Coloring {
         def color:String
         /**
-          * 语法糖：这里是最容易引起“误解”的地方。
+          * 语法糖：方法名_= 的方法在 scala 中是一个代替 setter 的语法糖s，它具有以下特征：
           *
-          * 1) 首先，下划线（_）连接了 "color" 和 "=" 让他们连成同一个变量(函数)名："color_="
+          * 1) 首先，必须存在一个与“方法名”同名的属性
           *
-          * 2) 其次，在引用这个变量（函数）的时候，下划线可以省略，也就是说。引用形式可以写成："color =" 或 "color="，等同于"color_="
+          * 2）其次，用下划线（_）连接“方法名” 和 "=" 让他们连成同一个变量(方法)名："color_="
+          *
+          * 3) 然后，在引用这个变量（方法）的时候，下划线可以省略，也就是说。引用形式可以写成："color =" 或 "color="，等同于"color_="
           *    需要注意的是，这种便利只是一个调用端的约定，并不意味着对象真的引出了 "color =" 或 "cclor=" 名称
           *
           * 参考： https://www.dustinmartin.net/getters-and-setters-in-scala:
