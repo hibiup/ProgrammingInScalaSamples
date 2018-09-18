@@ -109,7 +109,7 @@ package sample_13 {
     }
 
 
-    object Implicit_parameter {
+    object Implicit_value {
         /**
           * 隐式参数：可以根据需要动态灵活地为函数选择参数．
           **/
@@ -172,4 +172,34 @@ package sample_13 {
         }
     }
 
+    object Implicitly_add_trait_for_class {
+        /** implicit class 也可以用于为 trait　添加方法　*/
+
+        /** 1) 目标类　*/
+        case class Address(street: String, city: String)
+
+        /** 2) typeclass，包含将要加载到目标类上去的方法． */
+        trait ToJSON {
+            def toJSON(level: Int = 0): String
+            val INDENTATION = " "
+            def indentation(level: Int = 0): (String,String) =
+                (INDENTATION * level, INDENTATION * (level+1))
+        }
+
+        /** 3) 为 Address 隐式加上 trait ToJSON （并实例化） */
+        implicit class AddressToJSON(address: Address) extends ToJSON {
+            def toJSON(level: Int = 0): String = {
+                val (outdent, indent) = indentation(level)
+                s"""{
+                   |${indent}"street": "${address.street}",
+                   |${indent}"city": "${address.city}"
+                   |$outdent}""".stripMargin
+            }
+        }
+
+        def apply() {
+            val a = Address("1 Scala Lane", "Anytown")
+            println(a.toJSON())
+        }
+    }
 }
