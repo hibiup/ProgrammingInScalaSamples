@@ -4,6 +4,22 @@ import org.scalatest.FunSuite
 import programming_scala_2nd_edition.sample_13.implicitly_sample.MyList
 
 class Sample_13_implicit_test extends FunSuite{
+    test("Test implicit type conversion") {
+        Implicate_Conversion()
+    }
+
+    test("Test implicit class") {
+        Implicit_Class()
+    }
+
+    test("Test implicit evidence") {
+        Implicit_Evidence()
+    }
+
+    test("test implicit parameter") {
+        Implicit_parameter()
+    }
+
     test("implicit sort list") {
         val list = MyList(List(1, 3, 5, 2, 4))
         /** 　
@@ -14,11 +30,4 @@ class Sample_13_implicit_test extends FunSuite{
         println(list SortBy2 (i => -i))
     }
 
-    test("test implicit conversion") {
-        DB()
-    }
-
-    test("Test implicit evidence") {
-        ImplicitEvidence()
-    }
 }
