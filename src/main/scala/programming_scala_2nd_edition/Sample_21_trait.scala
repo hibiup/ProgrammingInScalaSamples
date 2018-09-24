@@ -32,9 +32,10 @@ package Sample_21_trait {
             abstract override def click() = {
                 if (count < maxAllowed) {
                     count += 1
-                    println(s"Click count: ${count}")
+                    println(s"Click count: ${count}/${maxAllowed}")
                     super.click()
                 }
+                else println("Nothing gonna happens.")
             }
         }
 
@@ -45,6 +46,8 @@ package Sample_21_trait {
                         override val maxAllowed = 2
                     }
 
+                button.click()
+                button.click()
                 button.click()
             }
         }
