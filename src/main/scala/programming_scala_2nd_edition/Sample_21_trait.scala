@@ -46,9 +46,7 @@ package Sample_21_trait {
                         override val maxAllowed = 2
                     }
 
-                button.click()
-                button.click()
-                button.click()
+                (1 to 5) foreach (_ => button.click())
             }
         }
     }
