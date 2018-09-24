@@ -2,6 +2,7 @@ package programming_scala_2nd_edition
 
 package Sample_17_for {
 
+    import scala.util.Either.{LeftProjection, RightProjection}
     import scala.util.Properties
 
     object RemoveBlanks {
@@ -77,17 +78,17 @@ package Sample_17_for {
 
     object RegExpression {
         def apply() = {
-            val reg = """([0-9]+)""".r
+            val reg = """([0-9]+)""".r  // 必须(用括号)定义 group。不算 group0(group0 就是输入本身)。
             val numberOnly = for {
                 x <- Seq("1","123")
-                reg(n) = x       // 表达式可以出现在左边！
+                reg(n) = x              // 表达式可以出现在左边！
             } yield (n)
 
             // 等价于:
             val _ = for {
                 x <- Seq("1","123")
-                n = x match {    // 展开
-                    case reg(a) => a
+                n = x match {           // 展开后等于 pattern matching
+                    case reg(a) => a    // 变长参数从 group1 开始，所以匹配表达式必须定义 group。
                 }
             } yield (n)
 
