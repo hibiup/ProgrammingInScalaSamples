@@ -9,6 +9,7 @@ class Sample_22_typesystem_bounds_test extends FunSuite{
     }
 
     test("View bound") {
-        ViewBound()
+        ViewBound1()
+        ViewBound2()
     }
 }

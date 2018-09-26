@@ -43,7 +43,7 @@ package Sample_22_typesystem_bounds {
         }
     }
 
-    object ViewBound {
+    object ViewBound1 {
         /**
           * 视图界定（View Bounds）:
           * */
@@ -94,6 +94,37 @@ package Sample_22_typesystem_bounds {
             println(Serialization.serializedInt(100))
             println(Serialization.serializedFloat(3.1f))
             println(Serialization.serializedString("Hello"))
+        }
+    }
+
+    object ViewBound2 {
+        /**
+          *  取代 View Bound 更通用的解决办法是：p(321)
+          **/
+
+        // 定义一个通用的泛型函数
+        case class WritableOps[A](value: A) {
+            def write: String = s"-- $value --"  // 得到 value 的序列化值
+        }
+        type Writable[A] = A => WritableOps[A]  // 定义一个类型。（不是必须的，只是为了更好用）
+
+        // 定义隐式转换函数(变量)，完全等价于 ViewBound1 中的隐式函数。
+        implicit val fromInt: Writable[Int] = (i: Int) => WritableOps(i)
+        implicit val fromFloat: Writable[Float] = (f: Float) => WritableOps(f)
+        implicit val fromString: Writable[String] = (s: String) => WritableOps(s)
+
+        object Serialization {
+            /**
+              * [T : Writable] 取代了 [T <% Writable]。好处是 Writable 的类型参数 A 可以上下文隐式得到。
+              */
+            def serialized[T: Writable](t: T): String = t.write
+        }
+
+        def apply() = {
+            // 1-A) 使用 View Bound 函数。
+            println(Serialization.serialized(100))
+            println(Serialization.serialized(3.1f))
+            println(Serialization.serialized("Hello"))
         }
     }
 }
