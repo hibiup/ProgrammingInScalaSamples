@@ -53,7 +53,7 @@ package Sample_22_typesystem_bounds {
 
         object Serialization {
             /**
-              * 1-A) 符号 [T <% U] 是试图界定表达式。它表示参数 T 必须有一个对应的视图，将其映射到类型 U
+              * 1-A) 符号 [T <% U] 是视图界定表达式。它表示参数 T 必须有一个对应的视图，将其映射到类型 U
               *      本例中表示参数 T 应该可以被映射到 Writable。因此我们需要为 T => Writable 定义隐式转换。
               **/
             def serialized[T <% Writable](t: T): String = t.write
