@@ -59,8 +59,7 @@ package Sample_22_typesystem_bounds {
             def serialized[T <% Writable](t: T): String = t.write
 
             /**
-              *  1-B) 实际上 View bound 已经不被推荐 （https://issues.scala-lang.org/browse/SI-7629）
-              *       因为单纯通过隐式转换就可以完成这项功能。
+              *  1-B) 单纯通过隐式转换也可以完成这项功能。
               * */
             def serialized2(t: Writable): String = t.write
 
@@ -99,7 +98,8 @@ package Sample_22_typesystem_bounds {
 
     object ViewBound2 {
         /**
-          *  取代 View Bound 更通用的解决办法是：p(321)
+          * 虽然隐式可以达成相同效果，但是 View bound 的语法更清晰，不过实际上 View bound 本身也已经不被推荐
+          * （https://issues.scala-lang.org/browse/SI-7629）推荐用 context bound 取代之：p(321)
           **/
 
         // 定义一个通用的泛型函数
@@ -115,16 +115,26 @@ package Sample_22_typesystem_bounds {
 
         object Serialization {
             /**
-              * [T : Writable] 取代了 [T <% Writable]。好处是 Writable 的类型参数 A 可以上下文隐式得到。
+              * 隐式上下文边界(context bound)语法 [T : Writable] 取代了视图边界语法[T <% Writable]。
+              * [T: Writable] 被编译器解释为: Writable[T]
+              *
+              * 隐式上下文边界(context bound)语法参考 p114
               */
             def serialized[T: Writable](t: T): String = t.write
+            // [T: Writable] 等价于 Writable[T] 等价于 WritableOps[A]
+            def serialized2[T](t: WritableOps[T]): String = t.write
         }
 
         def apply() = {
-            // 1-A) 使用 View Bound 函数。
+            // 使用 context Bound。
             println(Serialization.serialized(100))
             println(Serialization.serialized(3.1f))
             println(Serialization.serialized("Hello"))
+
+            // 不使用 context Bound。
+            println(Serialization.serialized2(100))
+            println(Serialization.serialized2(3.1f))
+            println(Serialization.serialized2("Hello"))
         }
     }
 }
