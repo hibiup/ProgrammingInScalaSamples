@@ -154,13 +154,14 @@ package types {
                 def receiveUpdate(subject: S)
             }
 
-            /** 3) 消息发布者有两个主要方法。1) 添加观察者。2) 在发布消息时将自身(this)传递给观察者 */
-            trait Subject { self: S =>  /** 6) 关键: 为Subject 声明一个自类型标记self: S。这意味着我们现在可以“假设”Subject 为子类型 S 的实例。*/
+            /** 3) 消息发布者有两个主要方法。a) 添加观察者。b) 在发布消息时将自身(this)传递给观察者 */
+            trait Subject {
+                self: S =>  /** 5) 关键: 所以为Subject 声明一个自类型标记self: S。这意味着我们现在可以“假设”Subject 为子类型 S 的实例。*/
                 def label:String
                 private var observers = List[O]()
                 def addObserver(observer: O) = observers ::= observer
 
-                /** 5) 然而，当我们编译时，如果传递给 receiveUpdate 的是 this ，而不是 S 会出错，因为 this 是 Subject，而要求的是 S。 */
+                /** 4) 然而，当我们编译时，如果传递给 receiveUpdate 的是 this ，会出错，因为 this 是 Subject，而不是要求的 S。 */
                 def notifyObservers() = observers.foreach(_.receiveUpdate(self))
             }
         }
@@ -170,8 +171,8 @@ package types {
             type S = SubjectButton
 
             /**
-              * 2) 如果没有(1) extends Subject 会出错，因为 Subject 的 self: S => 意味着“假设 Subject 为类型 S，
-              * 但是如果没有(1) S 又不存在。
+              * 2) 如果没有(1) extends Subject 会出错，因为 Subject 的 self: S => 意味着我们视 Subject 为类型 S，
+              * 但是如果没有(1) S 又不存在，它们互相依赖。所以缺少任何一句都无法通过编译。
               **/
             class SubjectButton(name:String) extends Subject {
                 val label = name
@@ -180,7 +181,7 @@ package types {
                 }
             }
 
-            /** 但是 Observer 没有这样的缠绕关系 */
+            /** Observer 没有这样的缠绕关系 */
             type O = ButtonObserver
             class ButtonObserver extends Observer {
                 def receiveUpdate(button: SubjectButton)= {
