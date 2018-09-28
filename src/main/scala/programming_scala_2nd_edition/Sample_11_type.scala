@@ -88,6 +88,46 @@ package types {
         }
     }
 
+    object ShadowType2 {
+        def apply() = {
+            class Service {
+                class Logger {
+                    def log(message: String): Unit = println(s"log: $message")
+                }
+
+                // 下面生成　s2　实例的时候将 s1.logger 赋予此变量，因为 s1.Logger 类型上不等同于 s2.Logger．因此要使用投影类型来避免类型不匹配错误．
+                val logger: Service#Logger = new Logger
+            }
+
+            val s1 = new Service
+            val s2 = new Service { override val logger = s1.logger }  // 用 s1.Logger 赋予 s2.Logger
+        }
+    }
+
+    package TypePath {
+        object O1 {
+            object O2 {
+                val name = "name"
+            }
+            class C1 {
+                val name = "name"
+            }
+        }
+
+        object TestTypePath {
+            def apply() = {
+                val name1 = TypePath.O1.O2.name        // 正确 - 路径表达式指向某一固定（实例）字段
+                // val name2 = TypePath.O1.C1.name     // 错误 - 指向的是"类"下的字段，而类是没有固定的路径的。
+
+                type T1 = TypePath.O1.C1               // 正确 - 路径表达式指向“类的类型”
+                // val T2 = TypePath.O1.C1             // 错误 - “类的类型”不是一个值
+
+                val c1:T1 = new T1                     // 正确 - 类型可以被 new
+                val c2:c1.name.type = c1.name          // 正确 - 类型可以从具体实例中引出。
+            }
+        }
+    }
+
     object StructuralType {
         def apply(): Unit = {
             /**
@@ -142,10 +182,11 @@ package types {
     }
 
     package SelfTypeAnnotation {
-        /** 用自类型标记　(self-type annotation)　将实例自身指向抽象类型 */
+        /** 用自类型标记　(self-type annotation)　将实例自身指向基类型．实际上与使用继承和混入等价，并在使用 this（或 self） 的时候强制转换类型．
+          * 以下是一个相当于 "强制转换" 的例子．*/
 
         trait SubjectObserver {
-            /** 1) 在观察者模式中，我们定义两个类型，一个是消息发布者（S），一个是消息关注者（O）　*/
+            /** 1) 在观察者模式中，我们定义两个抽象类型，一个是消息发布者（S），一个是消息关注者（O）　*/
             type S <: Subject
             type O <: Observer
 
@@ -156,12 +197,13 @@ package types {
 
             /** 3) 消息发布者有两个主要方法。a) 添加观察者。b) 在发布消息时将自身(this)传递给观察者 */
             trait Subject {
-                self: S =>  /** 5) 关键: 所以为Subject 声明一个自类型标记self: S。这意味着我们现在可以“假设”Subject 为子类型 S 的实例。*/
+                self: S =>  /** 5) 关键: 自类型标记将 Subject 声明为 S。这意味着我们现在可以视 Subject 为类型 S 的实例。*/
                 def label:String
                 private var observers = List[O]()
                 def addObserver(observer: O) = observers ::= observer
 
-                /** 4) 然而，当我们编译时，如果传递给 receiveUpdate 的是 this ，会出错，因为 this 是 Subject，而不是要求的 S。 */
+                /** 4) 然而，当我们编译时，如果传递给 receiveUpdate 的是 this ，会出错，因为 this 是 Subject，而不是要求的 S。
+                  *    所以这时候要做强制转换，于是我们考虑用自类型标记  */
                 def notifyObservers() = observers.foreach(_.receiveUpdate(self))
             }
         }
@@ -194,6 +236,76 @@ package types {
                 button.addObserver(new ButtonObserver())
                 button.notifyObservers()
             }
+        }
+    }
+
+    package SelfTypeAnnotation2 {
+        /**
+          * 以下这个蛋糕模式（cake pattern）演示了相当于继承和混入的用法．
+          **/
+
+        /** 1) 以下给出了一个三层的应用程序，分别是持久层、中间层和 UI 层的定义． */
+        trait Persistence { def startPersistence(): Unit }
+        trait Midtier { def startMidtier(): Unit }
+        trait UI { def startUI(): Unit }
+
+        /** 2) 定义一个trait（或者使用抽象类型），将各层连接在一起。
+          * 注意，此时我们并不需要它们的实现类！self type annotation 让我们可以基于抽象接口编程． */
+        trait App {
+            // 因为存在这个 self 的定义，下面的 run　可以执行 trait 提供的各项功能．
+            self: Persistence with Midtier with UI =>
+
+            // 以下函数的实现此时并不存在，但是因为 self type annotation 的缘故而不会出错.s
+            def run() = {
+                startPersistence()  // 这些方法在最终执行 run()　的时候得 App 实例将会提供．
+                startMidtier()
+                startUI()
+            }
+        }
+
+        object SelfTypeAnnotationSample2 {
+            /** 3) 下面是三层 trait 的具体实现。 */
+            trait Database extends Persistence {
+                def startPersistence(): Unit = println("Starting Database")
+            }
+
+            trait BizLogic extends Midtier {
+                def startMidtier(): Unit = println("Starting BizLogic")
+            }
+
+            trait WebUI extends UI {
+                def startUI(): Unit = println("Starting WebUI")
+            }
+
+            def apply(): Unit = {
+                /** 4) 生成正式类实例，在此时才正式需要 trait 的具体实现　*/
+                val app = new App with Database with BizLogic with WebUI
+                app.run()
+            }
+        }
+    }
+
+    object ThisAlias{
+        class C1 {
+            self => // 单纯的 "=>" 相当于为 this 起别名
+            def talk(message: String) = println("C1.talk: " + message)
+            class C2 {
+                class C3 {
+                    def talk(message: String) = self.talk("C3.talk: " + message) // 用self 调用C1.talk。
+                }
+                val c3 = new C3
+            }
+            val c2 = new C2
+        }
+
+        def apply() = {
+            val c1 = new C1
+
+            // 用c1 实例调用C1.talk。
+            c1.talk("Hello") // C1.talk: Hello
+
+            // 用c1.c2.c3 实例调用C3.talk，C3.talk 调用C1.talk。
+            c1.c2.c3.talk("World") // C1.talk: C3.talk: World
         }
     }
 }

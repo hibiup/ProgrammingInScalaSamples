@@ -2,7 +2,9 @@ package programming_scala_2nd_edition.sample_11
 
 import org.scalatest.FunSuite
 import programming_scala_2nd_edition.sample_11.types.SelfTypeAnnotation.TestSubjectObserver
-import programming_scala_2nd_edition.sample_11.types._
+import programming_scala_2nd_edition.sample_11.types.SelfTypeAnnotation2.SelfTypeAnnotationSample2
+import programming_scala_2nd_edition.sample_11.types.TypePath.TestTypePath
+import programming_scala_2nd_edition.sample_11.types.{SelfTypeAnnotation2, _}
 
 import scala.reflect.runtime.universe._
 
@@ -13,6 +15,11 @@ class Sample_11_type extends FunSuite {
 
     test ("Inner type") {
         ShadowType()
+        ShadowType2()
+    }
+
+    test ("Type path") {
+        TestTypePath()
     }
 
     test("Test single type") {
@@ -29,6 +36,14 @@ class Sample_11_type extends FunSuite {
 
     test("Abstract Type") {
         AbstractType.TypeHeritage()
+    }
+
+    test ("Self-Type　Annotation sample 2") {
+        SelfTypeAnnotationSample2()
+    }
+
+    test("Test This Alias") {
+        ThisAlias()
     }
 
 }

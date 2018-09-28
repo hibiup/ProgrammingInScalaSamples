@@ -1,6 +1,30 @@
 package programming_scala_2nd_edition.sample_6
 
-object duck_typing extends App{
+object StructialType {
+    /** 以下是利用 structural type 实现观察者模型的例子 */
+    trait SubjectFunc {
+        type State
+        type Observer = State => Unit  // 1) 观察者被定义成一个函数变量
+        private var observers: List[Observer] = Nil
+
+        def addObserver(observer:Observer): Unit = observers ::= observer            // 添加观察者
+        def notifyObservers(state: State): Unit = observers foreach (o => o(state))  // 调用观察者
+    }
+
+    def apply() = {
+        val subject = new SubjectFunc {
+            type State = Int
+        }
+        // 2) 实现观察者函数变量
+        val observer: Int => Unit = (state: Int) => println("got one! " + state)
+
+        // 3) 添加并调用
+        subject.addObserver(observer)
+        subject.notifyObservers(1)
+    }
+}
+
+object duck_typing {
     // 鸭类 (typeclass)
     trait Bird {
         def fly:Unit = println("I can fly!")
@@ -32,42 +56,57 @@ object duck_typing extends App{
         def color_=(value:String) = println("No, you can't change it")   // "color_=" 是一个函数名，不是赋值操作
     }
 
-    val duckFactory = (age:Int, c:String) => {    // 1）返回一个带有 trait Duck 接口的类实例
-        if (age >= 18) new Bird with Swimming with Quacking with Coloring {
-            override def color = c
+    def apply() = {
+        val duckFactory = (age:Int, c:String) => {    // 1）返回一个带有 trait Duck 接口的类实例
+            if (age >= 18) new Bird with Swimming with Quacking with Coloring {
+                override def color = c
+            }
+            else new Bird with Swimming with Quacking with Coloring {
+                override def fly = println("I can't fly!")
+                private var _color = c
+                override def color:String = _color
+                override def color_=(value:String) = _color = value
+            }
         }
-        else new Bird with Swimming with Quacking with Coloring {
-            override def fly = println("I can't fly!")
-            private var _color = c
-            override def color:String = _color
-            override def color_=(value:String) = _color = value
+
+        /** structural type */
+        def DuckFly(duck: {def fly: Unit}) {
+            duck.fly
+        } // 2）接受的数据类型可以为 AnyRef 但是只需要含有 def fly: Unit 方法
+        def DuckTwit(duck: {def twit: Unit}) {
+            duck.twit
         }
+
+        def DuckSwimming(duck: {def swim: Unit}) {
+            duck.swim
+        }
+
+        def DuckShowColor(duck: {def color: String}) {
+            println(duck.color)
+        }
+
+        /**
+          * 引入 "def color:String" 只是为了做类型匹配，实际上并没有被调用到。duck.color=c 实际上调用了 color_=() 方法。
+          * 利用的是 scala 方法或函数名称中下的划线在调用端可以省略的语法糖。
+          **/
+        def ChangeColor(duck: {def color_=(value: String); def color: String})(c: String) {
+            duck.color = c
+        }
+
+        val childDuck = duckFactory(1, "YELLO")
+        val adultDuck = duckFactory(18, "BLACK")
+
+        DuckSwimming(childDuck)
+        DuckTwit(childDuck)
+        DuckFly(childDuck)
+        DuckShowColor(childDuck)
+        ChangeColor(childDuck)("RED")
+        DuckShowColor(childDuck)
+
+        DuckSwimming(adultDuck)
+        DuckTwit(adultDuck)
+        DuckFly(adultDuck)
+        DuckShowColor(adultDuck)
+        ChangeColor(adultDuck)("GREEN")
     }
-
-    /** structural type */
-    def DuckFly(duck: {def fly: Unit}) {duck.fly}     // 2）接受的数据类型可以为 AnyRef 但是只需要含有 def fly: Unit 方法
-    def DuckTwit(duck: {def twit: Unit}) {duck.twit}
-    def DuckSwimming(duck: {def swim: Unit}) {duck.swim}
-    def DuckShowColor(duck: {def color: String}) {println(duck.color)}
-    /**
-      * 引入 "def color:String" 只是为了做类型匹配，实际上并没有被调用到。duck.color=c 实际上调用了 color_=() 方法。
-      * 利用的是 scala 方法或函数名称中下的划线在调用端可以省略的语法糖。
-      * */
-    def ChangeColor(duck: {def color_=(value:String); def color:String})(c:String) { duck.color=c }
-
-    val childDuck = duckFactory(1, "YELLO")
-    val adultDuck = duckFactory(18, "BLACK")
-
-    DuckSwimming(childDuck)
-    DuckTwit(childDuck)
-    DuckFly(childDuck)
-    DuckShowColor(childDuck)
-    ChangeColor(childDuck)("RED")
-    DuckShowColor(childDuck)
-
-    DuckSwimming(adultDuck)
-    DuckTwit(adultDuck)
-    DuckFly(adultDuck)
-    DuckShowColor(adultDuck)
-    ChangeColor(adultDuck)("GREEN")
 }
