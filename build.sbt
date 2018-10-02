@@ -11,5 +11,6 @@ libraryDependencies ++= Seq(
     "org.scalatest" %% "scalatest" % scalaTestVersion % "test",
     "com.typesafe.akka" %% "akka-actor" % akkaVersion,
     "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-    "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1"
+    "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1",
+    "org.scala-lang.modules" %% "scala-async" % "0.9.6"
 )
