@@ -81,8 +81,12 @@ package Sample_17_for {
             val reg = """([0-9]+)""".r  // 必须(用括号)定义 group。不算 group0(group0 就是输入本身)。
             val numberOnly = for {
                 x <- Seq("1","123")
-                reg(n) = x              // 表达式可以出现在左边！
+                reg(n) = x              // 表达式出现在左边！
             } yield (n)
+
+            // reg(n) = x 是匹配语法，通过 unapply 生效，单独使用的语法如下：
+            val reg(n) = "123"
+            println(n)
 
             // 等价于:
             val _ = for {
