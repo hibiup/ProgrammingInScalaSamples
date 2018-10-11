@@ -2,7 +2,7 @@ package programming_scala_2nd_edition
 
 package Sample_29_Symbo {
     object SymboTest {
-        /** Symbol: 符号字面量类型。语法为 '<标识符>
+        /** Symbol: 符号字面量类型。语法为 '<标识符>。两个相同标识符的符号指向同一个对象。
           *
           * 符号字面量典型的应用场景是在动态语言中作为一个标识符。比如要执行数据库操作，参数可能是一个字段名，比如 firstName，
           * 动态语言可能直接使用 firstName 作为参数：
