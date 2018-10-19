@@ -14,3 +14,5 @@ libraryDependencies ++= Seq(
     "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1",
     "org.scala-lang.modules" %% "scala-async" % "0.9.6"
 )
+
+scalacOptions ++= Seq("-feature")
