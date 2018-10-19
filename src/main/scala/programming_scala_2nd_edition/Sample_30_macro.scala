@@ -21,7 +21,6 @@ package Sample_30_micro {
     object ShowCode {
         /* 下面这个例子会打印出 apply() 的参数， 因为测试案例传入的 apply() 的参数是一段代码，所以它会打印出每一行代码。 */
 
-
         /** 2) 定义一个函数，名称随意。接受两个参数：
           *     第一个是 blackbox.Context。指的是 macro 被应用的宿主，也就是 apply() 函数的上下文。（注：有 blackbox 就有 whitebox ）
           *     第二个参数是第一个参数的 Tree，Tree 定义在 scala.reflect.macros 中，它保存着 c 的参数，在这里就是 apply 的参数。*/
@@ -40,6 +39,8 @@ package Sample_30_micro {
 
             /** 5) 执行 loggedStats 中的命令字面量（逐行打印出指令。） */
             q"..$loggedStats"
+
+            /* 引申：如果需要可以修改或添加新的指令，让执行结果不同于传入的参数。一个应用场景是实现 Spring 的依赖注入功能。 */
         }
 
         /** 6) 将函数作为 macro 应用到别处。 */
