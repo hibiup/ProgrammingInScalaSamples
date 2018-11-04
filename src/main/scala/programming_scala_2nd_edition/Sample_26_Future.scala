@@ -3,7 +3,62 @@ package programming_scala_2nd_edition
 package Sample_26_Future {
 
     import scala.concurrent.Future
-    import scala.util.{Failure, Try}
+    import scala.util.{Failure, Success, Try}
+
+    object TryFuture {
+        /** 隐式引入缺省线程池 */
+        import scala.concurrent.ExecutionContext.Implicits.global
+
+        def apply(): Unit = {
+            val f = Future {
+                throw new Exception
+            }
+
+            /** Try 避免直接崩溃 */
+            val res = Try(f)
+            assert(res.get.isInstanceOf[Future[Failure[Exception]]])
+            res.foreach(println)
+        }
+    }
+
+    object FutureCallbackFunctions {
+        /** 隐式引入缺省线程池 */
+        import scala.concurrent.ExecutionContext.Implicits.global
+
+        def apply() {
+            val f = Future[Either[Exception,String]] {
+                val r:Either[Exception, String] = Right("right")
+                val l:Either[Exception, String] = Left(new RuntimeException)
+                //throw new RuntimeException("??")
+                r
+            }
+
+            f.onComplete{
+                /** 1) 无论成功失败，都会首先执行 onComplete
+                  *    x 不会被解包 = Success[Either, Option 或 Some] or Failure[Either, Option 或 Some]
+                  *    onComplete 没有返回值，不改变 Future 的执行结果 */
+                case x => println(s"onComplete() => $x")
+            }
+
+            f.onFailure{
+                /** 2） 如果失败，执行在 onComplete 之后
+                  *     unbox 会得到解包后的值，Either, Option 或 Some
+                  *     onFailure 没有返回值，不改变 Future 的执行结果 */
+                case unbox => println(s"onFailure() => $unbox")
+            }
+
+            f.onSuccess{
+                /** 2） 如果成功，执行在 onComplete 之后
+                  *     unbox 会得到解包后的值，Either, Option 或 Some
+                  *     onSuccess 没有返回值，不改变 Future 的执行结果 */
+                case unbox => println(s"onSuccess() => $unbox")
+            }
+
+            /** 要么返回 Future[Success[...]]，要么返回 Future[Failure[...]] */
+            val res = Try(f)
+            println(res.get)
+        }
+    }
 
     object FutureAwait{
         def apply() = {
@@ -35,21 +90,6 @@ package Sample_26_Future {
         }
     }
 
-    object TryFuture {
-        /** 隐式引入缺省线程池 */
-        import scala.concurrent.ExecutionContext.Implicits.global
-
-        def apply(): Unit = {
-            val f = Future {
-                throw new Exception
-            }
-
-            /** Try 避免直接崩溃 */
-            val res = Try(f)
-            assert(res.get.isInstanceOf[Future[Failure[Exception]]])
-            res.foreach(println)
-        }
-    }
 
     object FutureComplete {
         /** p370

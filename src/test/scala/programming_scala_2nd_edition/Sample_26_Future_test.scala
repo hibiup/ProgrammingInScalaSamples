@@ -4,6 +4,10 @@ import org.scalatest.FunSuite
 import programming_scala_2nd_edition.DynamicFutureReturnType.Compute
 
 class Sample_26_Future_test extends FunSuite{
+    test("Future callback") {
+        FutureCallbackFunctions()
+    }
+
     test("Future be await") {
         FutureAwait()
     }

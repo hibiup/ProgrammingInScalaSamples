@@ -3,6 +3,7 @@ package programming_scala_2nd_edition
 package Sample_18_option {
 
     import scala.util.Either.{LeftProjection, RightProjection}
+    import scala.util.Try
 
     object ForOptionObject {
         def apply(): Iterable[Int] = {
@@ -99,6 +100,27 @@ package Sample_18_option {
             assert(r.right == RightProjection(Right(12)))    // r 的 right 返回的是正确的　RightProjection(Right(12))
             // 于 l.left 类似，因为 r.right可以得到有效值，因此可以对它做操作
             assert(r.right.map(_.toDouble) == Right(12.0))
+        }
+    }
+
+    object TryEither {
+        def apply(): Unit = {
+
+            val l:Either[Exception, String] = Left(new RuntimeException("Failed"))
+            l match {
+                case Left(s:Exception) => println(s.getMessage)
+            }
+
+            val r:Either[Exception, String] = Right("custom_id")
+            r match {
+                case Right(s) => println(s)
+            }
+
+            val x1 = Try(r)
+            println(x1)
+
+            val x2 = Try(l)
+            println(x2)
         }
     }
 }

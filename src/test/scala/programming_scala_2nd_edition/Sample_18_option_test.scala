@@ -15,4 +15,8 @@ class Sample_18_option_test extends FunSuite{
     test("Either Projection") {
         EitherLeftProjection()
     }
+
+    test("Try either") {
+        TryEither()
+    }
 }
