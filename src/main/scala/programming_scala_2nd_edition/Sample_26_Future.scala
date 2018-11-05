@@ -2,7 +2,7 @@ package programming_scala_2nd_edition
 
 package Sample_26_Future {
 
-    import scala.concurrent.Future
+    import scala.concurrent.{Await, Future}
     import scala.util.{Failure, Success, Try}
 
     object TryFuture {
@@ -123,6 +123,34 @@ package Sample_26_Future {
         }
     }
 
+    object FutureException {
+        def apply() {
+            /** 隐式引入缺省线程池 */
+            import scala.concurrent.ExecutionContext.Implicits.global
+
+            val outer_f = Future {
+                /** successful 函数是一个条件函数，只有执行成功，才会执行 onSuccess 方法，否则既不会执行 onSuccess 也不会执行 onFailure */
+                val inner_f = Future.successful {
+                    if(false)
+                        Option("Ok")
+                    else throw new RuntimeException("Failed")
+                }
+                /** 不会执行 */
+                inner_f.onFailure{case x => println(s"onFailure() => $x") }
+                /** 不会执行 */
+                inner_f.onSuccess{ case x => println(s"onSuccess() => $x") }
+                /** 不会执行 */
+                inner_f.onComplete{ case x => println(s"onComplete() => $x") }
+            }
+
+            val inner_f = Try(outer_f)
+            println(inner_f)
+
+            val x = Try(inner_f)
+            println(x)
+        }
+    }
+
     object FutureAsync {
         /**
           * Async 与 Future 的例子
@@ -175,6 +203,33 @@ package Sample_26_Future {
                 val fut = asyncGetRecord(id)
                 println(Await.result(fut, Duration.Inf))
             }
+        }
+    }
+
+    object AwaitMultipleFutures {
+        import scala.async.Async.{async, await}
+        import scala.concurrent.ExecutionContext.Implicits.global
+        import scala.concurrent.duration._
+        import java.time.Instant
+
+        val f1 = async{
+            println(s"${Instant.now.getEpochSecond}: Future 1 start")
+            Thread.sleep(2000)
+            println(s"${Instant.now.getEpochSecond}: Future 1 end")
+        }
+
+        val f2 = async{
+            println(s"${Instant.now.getEpochSecond}: Future 2 start")
+            Thread.sleep(1000)
+            println(s"${Instant.now.getEpochSecond}: Future 2 end")
+        }
+
+        def apply() {
+            val f = async {
+                await(f2)
+                await(f1)
+            }
+            Await.result(f, 10 second)
         }
     }
 }

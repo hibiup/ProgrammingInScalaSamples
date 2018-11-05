@@ -27,4 +27,12 @@ class Sample_26_Future_test extends FunSuite{
     test("Test Future Await") {
         Compute()
     }
+
+    test("Await multiple futures") {
+        AwaitMultipleFutures()
+    }
+
+    test("Test Future Future exception") {
+        FutureException()
+    }
 }
