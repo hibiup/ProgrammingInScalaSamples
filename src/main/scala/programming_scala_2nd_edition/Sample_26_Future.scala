@@ -212,24 +212,27 @@ package Sample_26_Future {
         import scala.concurrent.duration._
         import java.time.Instant
 
-        val f1 = async{
+        val f1 = Future[String]{
             println(s"${Instant.now.getEpochSecond} - [Thread-${Thread.currentThread().getId}] - Future 1 start")
-            Thread.sleep(2000)
+            Thread.sleep(1000)
             println(s"${Instant.now.getEpochSecond} - [Thread-${Thread.currentThread().getId}] - Future 1 end")
+            "Done"
         }
 
-        val f2 = async{
+        val f2 = Future[Int]{
             println(s"${Instant.now.getEpochSecond} - [Thread-${Thread.currentThread().getId}] - Future 2 start")
-            Thread.sleep(1000)
+            Thread.sleep(2000)
             println(s"${Instant.now.getEpochSecond} - [Thread-${Thread.currentThread().getId}] - Future 2 end")
+            1
         }
 
         def apply() {
-            val f = async {
+            val f:Future[String] = async {
                 await(f2)
                 await(f1)
             }
-            Await.result(f, 10 second)
+            val x = Await.result(f, Duration.Inf)
+            println(x)
         }
     }
 }
