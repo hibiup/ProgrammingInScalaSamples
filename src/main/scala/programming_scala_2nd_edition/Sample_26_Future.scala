@@ -213,15 +213,15 @@ package Sample_26_Future {
         import java.time.Instant
 
         val f1 = async{
-            println(s"${Instant.now.getEpochSecond}: Future 1 start")
+            println(s"${Instant.now.getEpochSecond} - [Thread-${Thread.currentThread().getId}] - Future 1 start")
             Thread.sleep(2000)
-            println(s"${Instant.now.getEpochSecond}: Future 1 end")
+            println(s"${Instant.now.getEpochSecond} - [Thread-${Thread.currentThread().getId}] - Future 1 end")
         }
 
         val f2 = async{
-            println(s"${Instant.now.getEpochSecond}: Future 2 start")
+            println(s"${Instant.now.getEpochSecond} - [Thread-${Thread.currentThread().getId}] - Future 2 start")
             Thread.sleep(1000)
-            println(s"${Instant.now.getEpochSecond}: Future 2 end")
+            println(s"${Instant.now.getEpochSecond} - [Thread-${Thread.currentThread().getId}] - Future 2 end")
         }
 
         def apply() {
