@@ -6,18 +6,23 @@ package Sample_26_Future {
     import scala.util.{Failure, Success, Try}
 
     object TryFuture {
+        println(s"[Thread-${Thread.currentThread().getId}]: main thread")
         /** 隐式引入缺省线程池 */
         import scala.concurrent.ExecutionContext.Implicits.global
 
         def apply(): Unit = {
             val f = Future {
+                println(s"[Thread-${Thread.currentThread().getId}]: Future body")
                 throw new Exception
+            }
+            f.onComplete{
+                x => println(s"[Thread-${Thread.currentThread().getId}]: onComplete() -> x")
             }
 
             /** Try 避免直接崩溃 */
             val res = Try(f)
             assert(res.get.isInstanceOf[Future[Failure[Exception]]])
-            res.foreach(println)
+            res.foreach(x => println(s"[Thread-${Thread.currentThread().getId}]: res-> x"))
         }
     }
 
