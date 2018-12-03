@@ -44,7 +44,7 @@ class Sample_26_Future_test extends FunSuite{
         case class Round(count: Int)
 
         def playGame[T]: Round => Future[T] = (hit) => Future { playGame {
-            (new RuntimeException(hit.count.toString)).printStackTrace()
+            (new RuntimeException(s"Thread-${Thread.currentThread().getId}: Round-${hit.count}")).printStackTrace()
             Round( hit.count + 1)
         }}(ec).asInstanceOf[Future[T]]
 
