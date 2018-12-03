@@ -42,18 +42,18 @@ class Sample_26_Future_test extends FunSuite{
     test("Future should be able to avoid Stackoverflow") {
         import scala.concurrent.duration._
         implicit val ec: ExecutionContext = ExecutionContext.fromExecutor(new ForkJoinPool(1))
-        case class Fib(first: Int, second:Int)
+        case class Fib(first: Long, second:Long)
 
         val p = Promise[Fib]()
         val f = p.future
 
         def playGame(n: Int)(implicit fib: Fib=Fib(0,1)):Future[Fib] = (if (n > 0) Future { playGame(n-1) {
-            Fib(fib.second, fib.first+fib.second)
+            Fib(fib.second, fib.first + fib.second)
         }} else {
             p.success(fib)
         }).asInstanceOf[Future[Fib]]
 
-        playGame(10000)
+        playGame(1000000)
         println(Await.result(f, Duration.Inf))
     }
 }
