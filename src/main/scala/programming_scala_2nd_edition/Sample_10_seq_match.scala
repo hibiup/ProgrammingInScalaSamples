@@ -97,4 +97,55 @@ package Sample_10_seq_match {
                 })
         println(res)
     }
+
+    object seq_filter extends App {
+        var a = 0
+        /** 例一、List 和 filter 都是 eager 运算，因此运算的优先级是：
+          *    List 完成数列生成 ->
+          *      一次性过滤完成（过滤条件为a==0）得到的结果当然也就是全集了。 ->
+          *        a = a+1 对filter已经不起作用了，因为 eager filter已经结束。所以打印出全集。*/
+        List.range(1, 10)
+            .filter(_ => a % 2 == 0)
+                .foreach(x => {
+                    a = a+1;
+                    println(x)
+                })
+
+        a = 0
+        /** 例二（不推荐，原因见下）、Stream 是 Lazy 运算，所以第一次 filter 时集合中只有一个元素，因此运算等价于：
+          *   List(1).filger(_ =>a % 2 == 0).foreach(x => { a = a+1;println(x)}) 当计算完成后 a == 1，
+          *
+          * 第二轮运算时 Stream 对象重新生成，再次调用 filter时因为 a%2 ！= 0 ，因此输出为空，foreach 没有输入。
+          * 第三轮以后全都因为 a == 1 输出为空。。。*/
+        Stream.range(1, 10)
+            .filter(_ => a % 2 == 0)
+                .foreach(x => {
+                    a = a+1;
+                    println(x)
+                })
+
+        /** 例三、List 一尺性生成 1 到 10 ，但是因为 withFilter 是 lazy 的，因此它不会一起性过滤全部集合，而是根据需求
+          * 每次被 foreach 回调，可是foreach在打印第一个元素时改变了a, 结果悲剧了，它再也得不到输入了。。。*/
+        a = 0
+        List.range(1, 10)
+            .withFilter(_ => a % 2 == 0)
+                .foreach(x => {
+                    a = a+1;
+                    println(x)
+                })
+
+        /** 例四（推荐）、情况类似第三个例子，唯一不同的是 Stream 也是 Lazy 的，因此它和 withFilter 在语意上保持了一致，但是结果
+          * 和例三是一样的。*/
+        a = 0
+        Stream.range(1, 10)
+            .withFilter(_ =>
+                a % 2 == 0)
+                .foreach(x => {
+                    a = a+1;
+                    println(x)
+                })
+
+        /** 从例二开始，以上运算在到达 foreach 之前都存在 lazy 运算，因此都会反应 foreach 对 a 的改变，因此都只能完成一次输出。
+          * 其中例二和例四都直接回调到源头，而例三则只回调到 withFilter。但是例四的前后语意是一致的，因此例二不被推荐。 */
+    }
 }
