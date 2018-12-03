@@ -53,7 +53,7 @@ class Sample_26_Future_test extends FunSuite{
             p.success(fib)
         }).asInstanceOf[Future[Fib]]
 
-        playGame(1000000)
+        playGame(10000)
         println(Await.result(f, Duration.Inf))
     }
 }
