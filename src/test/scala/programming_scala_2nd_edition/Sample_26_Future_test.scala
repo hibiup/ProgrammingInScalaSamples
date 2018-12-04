@@ -5,6 +5,7 @@ import programming_scala_2nd_edition.DynamicFutureReturnType.Compute
 
 import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 import scala.concurrent.forkjoin.ForkJoinPool
+import scala.util.Success
 
 class Sample_26_Future_test extends FunSuite{
     test("Future callback") {
@@ -46,14 +47,14 @@ class Sample_26_Future_test extends FunSuite{
 
         val p = Promise[Fib]()
         val f = p.future
+        f.onComplete{case Success(Fib(first:Long, _)) => println(first)}
 
-        def playGame(n: Int)(implicit fib: Fib=Fib(0,1)):Future[Fib] = (if (n > 0) Future { playGame(n-1) {
-            Fib(fib.second, fib.first + fib.second)
-        }} else {
-            p.success(fib)
-        }).asInstanceOf[Future[Fib]]
+        def playGame(n: Int)(implicit fib: Fib=Fib(0,1)):Future[Fib] = Future {
+            if (n > 0) playGame(n - 1)(Fib(fib.second, fib.first + fib.second)) else p.success(fib)
+        }.asInstanceOf[Future[Fib]]
 
         playGame(1000000)
-        println(Await.result(f, Duration.Inf))
+
+        Await.result(f, Duration.Inf)
     }
 }
