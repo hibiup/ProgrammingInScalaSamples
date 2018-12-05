@@ -20,8 +20,12 @@ class Sample_13_implicit_test extends FunSuite{
         Implicit_value()
     }
 
-    test("Test implicit for trait") {
+    test("Test implicitly for trait") {
         Implicitly_add_trait_for_class()
+    }
+
+    test("implicitly context bounds") {
+        implicitly_context_bounds
     }
 
     test("implicit sort list") {
