@@ -44,14 +44,13 @@ class Sample_26_Future_test extends FunSuite{
         import scala.concurrent.duration._
         implicit val ec: ExecutionContext = ExecutionContext.fromExecutor(new ForkJoinPool(1))
 
-        val p = Promise[(Long, Long)]()
+        val p = Promise[ BigInt]()
         val f = p.future
-        f.onComplete{ case Success((first:Long, _)) => println(first)}
+        f.onComplete{ case Success(x:BigInt) => println(x)}
 
-        def playGame(n: Int, fib: (Long, Long)=(0,1)):Unit =
-            Future( if (n > 0) playGame(n - 1, (fib._2, fib._1 + fib._2)) else p.success(fib) )
+        def fib(n: Int, a:BigInt=0, b:BigInt=1):Unit = Future( if (n > 0) fib(n - 1, b, a+b) else p.success(a) )
 
-        playGame(100000000)
+        fib(10000)
 
         Await.result(f, Duration.Inf)
     }
