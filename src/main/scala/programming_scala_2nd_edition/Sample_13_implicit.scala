@@ -172,6 +172,14 @@ package sample_13 {
         }
     }
 
+    object implicitly_context_bounds {
+        case class MyClass(name:String)
+        implicit val myName = MyClass("Jeff")
+
+        /** implicitly：隐式地寻找满可以足填在这里的变量，被查找的目标变量也必须是 implicit 声明过的 */
+        println(implicitly[MyClass].name)
+    }
+
     object Implicitly_add_trait_for_class {
         /** implicit class 也可以用于为 trait　添加方法　*/
 
