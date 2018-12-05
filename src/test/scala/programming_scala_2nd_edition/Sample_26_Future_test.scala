@@ -49,7 +49,7 @@ class Sample_26_Future_test extends FunSuite{
         val f = p.future
         f.onComplete{case Success(Fib(first:Long, _)) => println(first)}
 
-        def playGame(n: Int)(implicit fib: Fib=Fib(0,1)):Future[Any] = Future[Any] {
+        def playGame(n: Int)(implicit fib: Fib=Fib(0,1)):Unit = Future {
             if (n > 0) playGame(n - 1)(Fib(fib.second, fib.first + fib.second)) else p.success(fib)
         }
 
