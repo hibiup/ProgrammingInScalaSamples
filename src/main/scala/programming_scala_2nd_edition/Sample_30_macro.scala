@@ -65,4 +65,15 @@ package Sample_30_micro {
     class PrintA[T] {
         def myPrint(cond:T):Unit = macro TestImpl._println[T]
     }
+
+    /** 另一种执行原码的方法是用 toolbox 将源代码实时编译并执行
+      * 需要　"org.scala-lang" % "scala-compiler" % scalaVersion.value 支持 */
+    object Compile_Source_Code {
+        import scala.reflect.runtime.currentMirror
+        import scala.tools.reflect.ToolBox
+        val toolbox = currentMirror.mkToolBox()
+
+        val source = """for (1 <- List(1, 1, 2)) println("ha")"""
+        toolbox.eval(toolbox.parse(source))
+    }
 }

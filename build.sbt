@@ -11,8 +11,11 @@ libraryDependencies ++= Seq(
     "org.scalatest" %% "scalatest" % scalaTestVersion % "test",
     "com.typesafe.akka" %% "akka-actor" % akkaVersion,
     "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+    "org.scala-lang" % "scala-compiler" % scalaVersion.value,
     "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1",
-    "org.scala-lang.modules" %% "scala-async" % "0.9.6"
+    "org.scala-lang.modules" %% "scala-async" % "0.9.6" /*,
+    "org.scalaz" %% "scalaz-core" % "7.2.18",
+    "org.scalaz" %% "scalaz-zio" % "0.5.0"*/
 )
 
 scalacOptions ++= Seq("-feature")

@@ -1,9 +1,29 @@
 package programming_scala_2nd_edition
 
-import org.scalatest.FunSuite
+import org.scalatest.{FlatSpec, FunSuite}
 import programming_scala_2nd_edition.Sample_17_for._
 
 class Sample_17_for_test extends FunSuite{
+    test("Irrefutable Pattern Generator") {
+        Generator_IrrefutablePattern()
+    }
+
+    test("Match Pattern Generator") {
+        Generator_MatchPattern()
+    }
+
+    test("Multiple Generator") {
+        Generator_Multiple_Pattern()
+    }
+
+    test("Generator with If") {
+        Generator_If()
+    }
+
+    test("for loop generator with definition") {
+        ForWithDefinition()
+    }
+
     test("filters write space") {
         val input = RemoveBlanks("src/main/scala/programming_scala_2nd_edition/Sample_17_for.scala")
 
@@ -19,10 +39,6 @@ class Sample_17_for_test extends FunSuite{
 
     test("multiple condition") {
         MultipleCondition() map println
-    }
-
-    test("for loop generator with definition") {
-        ForWithDefinition()
     }
 
     test("Read properties") {
