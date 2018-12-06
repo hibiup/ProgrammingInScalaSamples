@@ -38,7 +38,7 @@ class Sample_17_for_test extends FunSuite{
     }
 
     test("multiple condition") {
-        MultipleCondition() map println
+        MultipleCondition()
     }
 
     test("Read properties") {
