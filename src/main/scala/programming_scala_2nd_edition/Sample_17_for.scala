@@ -179,6 +179,7 @@ package Sample_17_for {
             // 动态反编译：
             println( q"""for (l1 <- List(1,2); l2 <- List(3,4); l3 <- List(5,6)) yield (l1, l2, l3)""" )
         }
+
     }
 
     /** 例6）有前后关联的多 Generator 和无关联的一样生成嵌套映射 */
