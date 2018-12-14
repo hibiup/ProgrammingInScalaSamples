@@ -7,7 +7,8 @@ package programming_scala_2nd_edition
   *     Setting -> Build, Execution, Deployment -> Compilers -> Scala Compoler -> Macros
   *
   * 命令行：build.sbt 加:
-  *     scalacOptions ++= Seq("-feature")
+  *     scalacOptions ++= Seq("-Xplugin-require:macroparadise")
+  *     addCompilerPlugin("org.scalamacros" %% "paradise" % "2.1.0" cross CrossVersion.full)
   *
   * 或 scalac 编译的时候加上：
   *     -language:experimental.macros
