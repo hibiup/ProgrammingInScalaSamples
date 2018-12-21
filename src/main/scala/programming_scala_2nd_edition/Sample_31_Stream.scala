@@ -9,21 +9,28 @@ object Sample_31_Stream {
         def fibStream(a: Int, b: Int): Stream[Int] = a #:: fibStream(b, a + b)
 
         /** 同样的运算在一个基于 List 的 fib 中必定会导致 StackOverflow，因为死循环会立刻执行．*/
-        def fibList(a: Int, b: Int): List[Int] = a :: fibList(b, a + b)
+        //def fibList(a: Int, b: Int): List[Int] = a :: fibList(b, a + b)
 
         /** 获取 fib stream 不会立即执行．*/
         val fib = fibStream(0,1)
-        /** 直到被触发．（注意，不要试图 collect 所有结果．）*/
+
+        /** take 是 lazy 的，不会导致执行．*/
         val res = fib.take(100000)
-        assert(100000 == res.toList.size)
+
+        /** 直到 toList 才会被触发 */
+        assert(100000 == res.toList.size)  // 并且触发执行 x * 2 运算
+
+        /** Stream 的 map 也是 laze 的*/
+        val doubleRes = fib.map( x=> { print(s"x * 2 = ")
+            x * 2})                // 不会执行 x * 2
 
         /**
-          * b) 要注意避免强制处理整个 stream．比如 force 函数，能够强制评估 stream 再返回结果。还有比如 size()、tolist() 等，
+          * 要注意避免强制处理整个 stream．比如 force 函数，能够强制评估 stream 再返回结果。还有比如 size()、tolist() 等，
           * 也不在没有退出机制的情况下使用 foreach()．以下的 foreach() 是安全的．
           * */
         import scala.util.control.Breaks._
         breakable {
-            fib.foreach {
+            doubleRes.foreach {    // 触发执行 x * 2
                 case x if x < 10 => println(x)
                 case _ => break
             }
