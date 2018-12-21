@@ -15,13 +15,13 @@ object Sample_31_Stream {
         val fib = fibStream(0,1)
 
         /** take 是 lazy 的，不会导致执行．*/
-        val res = fib.take(100000)
+        val res = fib.take(10000)
 
         /** 直到 toList 才会被触发 */
-        assert(100000 == res.toList.size)  // 并且触发执行 x * 2 运算
+        assert(10000 == res.toList.size)
 
         /** Stream 的 map 也是 laze 的*/
-        val doubleRes = fib.map( x=> { print(s"x * 2 = ")
+        val doubleRes = fib.map( x=> { print(s"Thread-${Thread.currentThread.getId}: $x * 2 = ")
             x * 2})                // 不会执行 x * 2
 
         /**
@@ -31,7 +31,7 @@ object Sample_31_Stream {
         import scala.util.control.Breaks._
         breakable {
             doubleRes.foreach {    // 触发执行 x * 2
-                case x if x < 10 => println(x)
+                case x if x < 100 => println(x)
                 case _ => break
             }
         }
@@ -42,6 +42,38 @@ object Sample_31_Stream {
         assert(100 == (0 to 10000).toStream.take(100).toList.size)
     }
 
+    def stream_collect() = {
+        def fibStream(a: Int, b: Int): Stream[Int] = a #:: fibStream(b, a + b)
+        val fib = fibStream(0,1)
+
+        /** collect 也是 lazy */
+        val res1 = fib.collect{ case x => { x * 2}}.take(10000)
+
+        /** 触发执行 x * 2 运算 */
+        assert(10000 == res1.toList.size)
+    }
+
+    /** Stream 支持并行，但是会立刻触发运算，将 res 恢复成 ParVector，所以不要将 par 直接作用在 Stream 上，会导致死循环。 */
+    def stream_parallelized() = {
+        def fibStream(a: BigInt, b: BigInt): Stream[BigInt] = a #:: fibStream(b, a + b)
+        val fib = fibStream(0,1)
+
+        /** Stream 支持并行，但是会立刻触发运算，将 res 恢复成 ParVector，所以不要将 par 直接作用在 Stream 上，会导致死循环。 */
+        val res = fib.take(20).par
+
+        /** res 不是 Stream 因此会立刻执行 x * 2。 */
+        val parDoubleRes = res.map( x=> {
+            println(s"Thread-${Thread.currentThread.getId}: $x * 2 = ")
+            x * 2}).toStream  // 将结果转回 Stream
+
+        import scala.util.control.Breaks._
+        breakable {
+            parDoubleRes.foreach {    // 不会再次触发执行 x * 2，只是将结果打印出来。
+                case x if x < 10 => println(x)
+                case _ => break
+            }
+        }
+    }
     /**
       * view 和 Stream 类似都是懒加载的，view 可以将一个集合转变成懒加载
       * */
@@ -55,7 +87,7 @@ object Sample_31_Stream {
 
         /** 作用于 view 的 map 方法也不会立刻触发执行，因此也是安全的。*/
         val numsDouble = numsView.map(x => {
-            print(s"$x * 2 = ")   // 不会立刻被打印
+            print(s"Thread-${Thread.currentThread.getId}: $x * 2 = ")   // 不会立刻被打印
             x * 2
         })
 
