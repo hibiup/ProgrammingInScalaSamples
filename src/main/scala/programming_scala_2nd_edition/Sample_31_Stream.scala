@@ -1,5 +1,6 @@
 package programming_scala_2nd_edition
 
+
 object Sample_31_Stream {
     def fib_stream() = {
         /**
@@ -58,8 +59,14 @@ object Sample_31_Stream {
         def fibStream(a: BigInt, b: BigInt): Stream[BigInt] = a #:: fibStream(b, a + b)
         val fib = fibStream(0,1)
 
+        /** 设置线程数 */
+        import scala.concurrent.forkjoin.ForkJoinPool
+        import scala.collection.parallel.ForkJoinTaskSupport
+        val pool = new ForkJoinTaskSupport(new ForkJoinPool(2))
+
         /** Stream 支持并行，但是会立刻触发运算，将 res 恢复成 ParVector，所以不要将 par 直接作用在 Stream 上，会导致死循环。 */
         val res = fib.take(20).par
+        res.tasksupport = pool   // 指定线程池
 
         /** res 不是 Stream 因此会立刻执行 x * 2。 */
         val parDoubleRes = res.map( x=> {
