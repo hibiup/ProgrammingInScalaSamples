@@ -71,7 +71,7 @@ object Sample_31_Stream {
         /** res 不是 Stream 因此会立刻执行 x * 2。 */
         val parDoubleRes = res.map( x=> {
             println(s"Thread-${Thread.currentThread.getId}: $x * 2 = ")
-            x * 2})  // 将结果转回 Stream
+            x * 2}).toStream  // 可以将结果转回 Stream
 
         import scala.util.control.Breaks._
         breakable {
