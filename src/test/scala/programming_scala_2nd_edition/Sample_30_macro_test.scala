@@ -19,4 +19,8 @@ class Sample_30_macro_test  extends FunSuite{
         val x = 2
         printA.myPrint(x + 2)
     }
+
+    test("Compile_Source_Code") {
+        Compile_Source_Code
+    }
 }
