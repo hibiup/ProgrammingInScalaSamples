@@ -1,7 +1,9 @@
 package programming_scala_2nd_edition.Sample_26_Future
 
-import org.scalatest.FunSuite
+import org.scalatest.{FlatSpec, FunSuite}
 import programming_scala_2nd_edition.DynamicFutureReturnType.Compute
+
+import scala.concurrent.{Await, Future}
 
 class Sample_26_Future_test extends FunSuite{
     test("Future callback") {
