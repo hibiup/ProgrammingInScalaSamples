@@ -141,8 +141,8 @@ package Sample_25_Monad {
             }
         }
         def rollDie(n:Int) =
-            for(_ <- 1 to n)   // seed 一样的话，结果也必然一样
-                println(randInt(RngNumber(100)))
+            for(i <- 1 to n)   // seed 一样的话，结果也必然一样
+                println(randInt(RngNumber(i*100)))
 
         /** map 函数版本 */
         def map[A, B](s: Rand[A])(f: A => B): Rand[B] = rng => {
@@ -150,7 +150,7 @@ package Sample_25_Monad {
             (f(a), rng2)
         }
         def rollDieMap(n:Int) =
-            for(_ <- 1 to n)
-                println(map(randInt)(x => x)(RngNumber(200)))
+            for(i <- 1 to n)
+                println(map(randInt)(x => x)(RngNumber(i*200)))
     }
 }
