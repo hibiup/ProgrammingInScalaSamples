@@ -12,4 +12,10 @@ class Sample_25_Monad_test extends FunSuite{
     test("Monda") {
         TestMonad()
     }
+
+    test("State Monad") {
+        import programming_scala_2nd_edition.Sample_25_Monad.RandomState._
+        rollDie(5)
+        rollDieMap(5)
+    }
 }

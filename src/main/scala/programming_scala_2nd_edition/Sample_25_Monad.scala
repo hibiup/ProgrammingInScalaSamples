@@ -101,6 +101,56 @@ package Sample_25_Monad {
                 println(OptionM.flatMap(Option.empty[Int])(optf)) // Option[Int]: None
             }
         }
+    }
 
+    object RandomState {
+        /**
+          * 通过一个无副作用的随机数生成器来阐述 FP 中的状态 State 转移 （《Scala函数式编程》 P-62）
+          * */
+
+        /**
+          * 随机数生成器总是从一个状态转移到另一个状态，这样才能源源不断地生成新的数字。新生成的数字是状态转移的结果，
+          * 称为 state action，记作 “A”，而在 FP 中，我们并不修改之前的状态，而是生成新的状态值（随机数生成器），
+          * 记作 “S”。因此有以下随机数函数接口定义。
+          * */
+        trait Rng {
+            def next:(Int, Rng)
+        }
+
+        /**
+          * 定义一个函数去调用上面的这个接口来进行状态运算（状态运算后我们才能得到A），根据 Rng的定义，这个函数应该输入
+          * 一个 Rng 接口，返回 (A, Rng)。由此我们可以得出这个函数类型的接口形态是：
+          * */
+        type Rand[+A] = Rng => (A, Rng)  // （注意：Rand[+A] 是一个函数的 type）
+
+        /**
+          * 因为 Rand 返回的是 Tuple，而我们要获得的是 Int，因此我们再定义一个获得 Int 的偏应用函数：
+          *
+          *   1) randInt 是一个 Rand[Int] 类型的偏应用函数
+          *   2) 既然 randInt 是 Rand，并根据以上定义直到它的待定参数类型是 Rng，要得到返回值就必须执行待定参数的 next 方法。
+          * */
+        val randInt:Rand[Int] = _.next
+
+        /**
+          * 模拟随机数算法
+          * */
+        final case class RngNumber(seed:Int) extends Rng {
+            override def next: (Int, Rng) = {
+                val newSeed = seed + 1   // 不是很严谨的随机数算法
+                (newSeed >>> 6, RngNumber(newSeed))
+            }
+        }
+        def rollDie(n:Int) =
+            for(_ <- 1 to n)   // seed 一样的话，结果也必然一样
+                println(randInt(RngNumber(100)))
+
+        /** map 函数版本 */
+        def map[A, B](s: Rand[A])(f: A => B): Rand[B] = rng => {
+            val (a, rng2) = s(rng)
+            (f(a), rng2)
+        }
+        def rollDieMap(n:Int) =
+            for(_ <- 1 to n)
+                println(map(randInt)(x => x)(RngNumber(200)))
     }
 }
