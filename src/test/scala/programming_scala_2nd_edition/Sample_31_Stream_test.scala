@@ -16,4 +16,6 @@ class Sample_31_Stream_test extends FlatSpec{
     "parallelized stream" should "" in {
         stream_parallelized()
     }
+
+    "test collect" should "" in stream_collect
 }

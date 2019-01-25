@@ -7,7 +7,7 @@ object Sample_31_Stream {
           * a) Stream 的 #:: 运算和 List 的 :: 运算类似，都是将右边的值一个一个取出，然后和左边的值结合在一起形成新的列表．
           * 但是 Stream 是 lazy 的，直到 take 发生的时候才会实际执行．并且是堆栈安全的．因此以下死循环是安全的。
           * */
-        def fibStream(a: Int, b: Int): Stream[Int] = a #:: fibStream(b, a + b)
+        def fibStream(a: BigInt, b: BigInt): Stream[BigInt] = a #:: fibStream(b, a + b)
 
         /** 同样的运算在一个基于 List 的 fib 中必定会导致 StackOverflow，因为死循环会立刻执行．*/
         //def fibList(a: Int, b: Int): List[Int] = a :: fibList(b, a + b)
@@ -27,7 +27,7 @@ object Sample_31_Stream {
 
         /**
           * 要注意避免强制处理整个 stream．比如 force 函数，能够强制评估 stream 再返回结果。还有比如 size()、tolist() 等，
-          * 也不在没有退出机制的情况下使用 foreach()．以下的 foreach() 是安全的．
+          * 也不在没有退出机制的情况下使用 foreach()．下面的 foreach() 设置了执行到 100 会退出，因此才安全，否则死循环．
           * */
         import scala.util.control.Breaks._
         breakable {
@@ -44,7 +44,7 @@ object Sample_31_Stream {
     }
 
     def stream_collect() = {
-        def fibStream(a: Int, b: Int): Stream[Int] = a #:: fibStream(b, a + b)
+        def fibStream(a: BigInt, b: BigInt): Stream[BigInt] = a #:: fibStream(b, a + b)
         val fib = fibStream(0,1)
 
         /** collect 也是 lazy */
@@ -64,7 +64,7 @@ object Sample_31_Stream {
         import scala.collection.parallel.ForkJoinTaskSupport
         val pool = new ForkJoinTaskSupport(new ForkJoinPool(2))
 
-        /** Stream 支持并行，但是会立刻触发运算，将 res 恢复成 ParVector，所以不要将 par 直接作用在 Stream 上，会导致死循环。 */
+        /** Stream 支持并行，但是会立刻触发运算将 res 恢复成 ParVector，所以不要将 par 直接作用在 endless Stream 上，会导致死循环。 */
         val res = fib.take(20).par
         res.tasksupport = pool   // 指定线程池
 
