@@ -36,7 +36,13 @@ object Sample_28_tag {
             println(ts.baseClasses)
             println(ts.members)
 
-            /** =:= 等符号是类型逻辑运算符 */
+            /** =:= 等符号是类型逻辑运算符
+              *
+                T=:=U (T 是不是跟 U 类型相同)
+                T<:<U (T 是不是 U 的子类型)
+                T<%<U (T 是不是能隐式转换到 U - 参考 context bound 的定义)
+              *
+              * */
             assert(toType(1) =:= toType(1))
             assert(typeOf[Seq[Int]] <:< typeOf[Seq[Any]])
         }
